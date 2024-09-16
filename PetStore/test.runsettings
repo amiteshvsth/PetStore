@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+
+	<!-- To run test in parallel -->
+	<MSTest>
+		<TestTimeout>60000</TestTimeout>
+		<!--15 minutes-->
+		<Parallelize>
+			<Workers>4</Workers>
+			<Scope>ClassLevel</Scope>
+		</Parallelize>
+	</MSTest>
+
+	<!-- Parameters used by tests at runtime -->
+	<TestRunParameters>
+		<Parameter name="Browser" value="chrome" />
+		<!--can be chrome,firefox,safari-->
+
+		<!--GREENKART -->
+		<Parameter name="PetStoreUrl" value="https://petstore.octoperf.com/actions/Catalog.action"/>
+	
+		<!--Tools QA -->>
+		<!--<Parameter name="ToolsqaapplicationUrl" value="https://demoqa.com/automation-practice-form" />-->
+
+
+	</TestRunParameters>
+
+</RunSettings>
