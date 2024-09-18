@@ -12,6 +12,7 @@ namespace PetStore.Pages
     internal class MyOrdersPO(IWebDriver driver) : BasePO(driver)
     {
         private readonly By orderId = By.XPath("//td/a");
+        private readonly By orderTime = By.XPath("//td[2]");
         private static By OrderIdByText(string id) => By.XPath($"//td/a[text()='{id}']");
         private static By OrderIdByIndex(int idx) => By.XPath($"(//td/a)[{idx}]");
         private static By OrderTimeById(string id) => By.XPath($"//td/a[text()='{id}']/parent::td/following-sibling::td[1]");
@@ -23,6 +24,19 @@ namespace PetStore.Pages
         {
             var orderIds = new List<string>();
             var elements = Driver.FindElements(orderId);
+
+            foreach (var element in elements)
+            {
+                orderIds.Add(element.Text);
+            }
+
+            return orderIds;
+        }
+
+        public List<string> GetAllOrderTime()
+        {
+            var orderIds = new List<string>();
+            var elements = Driver.FindElements(orderTime);
 
             foreach (var element in elements)
             {

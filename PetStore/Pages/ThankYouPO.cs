@@ -28,6 +28,7 @@ namespace PetStore.Pages
         private readonly By shippingZip = By.XPath("(//td[text()='Zip:'])[2]/following-sibling::td");
         private readonly By shippingCountry = By.XPath("(//td[text()='Country:'])[2]/following-sibling::td");
 
+        private readonly By thankYouText = By.XPath("//ul/li");
 
         private readonly By itemId = By.XPath("(//table)[2]/tbody/tr/td[1]");
         private readonly By itemName = By.XPath("(//table)[2]/tbody/tr/td[2]");
@@ -53,6 +54,10 @@ namespace PetStore.Pages
             Wait.UntilElementExists(ItemIdByName(name)).Click();
         }
 
+        public string GetThankYouText()
+        {
+            return Wait.UntilElementExists(thankYouText).Text;
+        }
         public string GetItemIdByIndex(int idx)
         {
             string itemName = Wait.UntilElementExists(ItemIdByIndex(idx)).Text;

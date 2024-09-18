@@ -1,6 +1,7 @@
 ﻿using OpenQA.Selenium;
 using PetStore.Base;
 using PetStore.utilities;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PetStore.Pages
 {
@@ -10,6 +11,9 @@ namespace PetStore.Pages
         private readonly By productId = By.XPath("//td/input/parent::td/preceding-sibling::td[3]");
         private readonly By itemName = By.XPath("//td/input/parent::td/preceding-sibling::td[2]");
 
+        private static By ProductIdByItemId(string id) => By.XPath($"//td/a[text()='{id}']/parent::td/following-sibling::td[1]");
+        private static By ProductIdByItemName(string name) => By.XPath($"//td[text()='{name}']/preceding-sibling::td[1]");
+        private static By ProductIdByItemIndex(int index) => By.XPath($"(//td/a/parent::td/preceding-sibling::td[5])[{index}]");
         private static By QuantityByName(string itemName) => By.XPath($"//td[contains(text(), '{itemName}')]/following-sibling::td/input");
         private static By QuantityByIndex(int index) => By.XPath($"(//td[contains(text(),'$')]/preceding-sibling::td/input)[{index}]");
         private static By QuantityByItemId(string itemID) => By.XPath($"//a[contains(text(), '{itemID}')]/parent::td/following-sibling::td/input");
@@ -26,18 +30,40 @@ namespace PetStore.Pages
         private static By TotalPriceByIndex(int index) => By.XPath($"(//td[7])[{index}]");
         private static By TotalPriceByName(string name) => By.XPath($"//td[contains(text(),'{name}')]/following-sibling::td[4]");
 
-        private static By RemoveItemButtonByIndex(int index) => By.LinkText($"//a[contains(text(), 'Remove')][{index}]");
-        private static By RemoveItemButtonByItemName(string name) => By.LinkText($"//td[contains(text(), '{name}')]/following-sibling::td/a");
-        private static By RemoveItemButtonByItemId(string itemId) => By.LinkText($"//td/a[contains(text(), '{itemId}')]/parent::td/following-sibling::td/a");
+        private readonly By totalPrice = By.XPath("//td/input/parent::td/following-sibling::td[2][contains(text(),'$')]");
+        private static By RemoveItemButtonByIndex(int index) => By.XPath($"//a[contains(text(), 'Remove')][{index}]");
+        private static By RemoveItemButtonByItemName(string name) => By.XPath($"//td[contains(text(), '{name}')]/following-sibling::td/a");
+        private static By RemoveItemButtonByItemId(string itemId) => By.XPath($"//td/a[text()='{itemId}']/parent::td/following-sibling::td/a");
 
         private readonly By updateCartButton = By.Name("updateCartQuantities");
         private readonly By proceedToCheckoutButton = By.LinkText("Proceed to Checkout");
         private readonly By subTotal = By.XPath("//tr/td[@colspan='7']");
         private readonly By returnToMainMenuButton = By.LinkText("Return to Main Menu");
 
-        private static By ItemIdByLinkText(string text) => By.LinkText(text);
+        private static string RemoveDollarSign(string input) => input?.Replace("$", string.Empty) ?? string.Empty;
+        private static string ClearSubTotalText(string input) => input?.Replace("Sub Total: $", string.Empty) ?? string.Empty;
+        public  By ItemIdByLinkText(string text) => By.LinkText(text);
         private static By ItemIdByItemName(string name) => By.XPath($"//td[text()='{name}']/preceding-sibling::td/a");
         private static By ItemIdByIndex(int index) => By.XPath($"(//td/a[text()='Remove']/parent::td/preceding-sibling::td/a)[{index}]");
+        private static By ItemNameByID(string id) => By.XPath($"//td/a[text()='{id}']/parent::td/following-sibling::td[2]");
+        private static By ItemNameByIndex(int idx) => By.XPath($"(//td/a/parent::td/following-sibling::td[2])[{idx}]");
+
+        public double GetSubTotalByCalculation()
+        {
+            //td/input/parent::td/following-sibling::td[2][contains(text(),'$')]
+            IReadOnlyCollection<IWebElement> elements = Driver.FindElements(totalPrice);
+            List<double> items = [];
+            foreach (IWebElement element in elements)
+            {
+                items.Add(double.Parse(RemoveDollarSign(element.Text)));
+            }
+            double subtot=0;
+            foreach (double item in items)
+            {
+                subtot += item;
+            }
+            return Math.Round(subtot, 2);
+        }
 
         //Get All Item Ids
         public List<string> GetAllItemId()
@@ -50,6 +76,43 @@ namespace PetStore.Pages
             }
             return items;
         }
+
+        public string GetItemNameByID(string id)
+        {
+            // Locate the element using the provided item ID and retrieve its text
+            string itemName = Wait.UntilElementExists(ItemNameByID(id)).Text;
+            return itemName;
+        }
+
+        public string GetItemNameByIndex(int idx)
+        {
+            // Locate the element by index and retrieve its text
+            string itemName = Wait.UntilElementExists(ItemNameByIndex(idx)).Text;
+            return itemName;
+        }
+
+
+        public string GetProductIdByItemId(string id)
+        {
+            // Locate the element using the provided item ID and retrieve its text
+            string productId = Wait.UntilElementExists(ProductIdByItemId(id)).Text;
+            return productId;
+        }
+
+        public string GetProductIdByItemName(string name)
+        {
+            // Locate the element by item name and retrieve its text
+            string productId = Wait.UntilElementExists(ProductIdByItemName(name)).Text;
+            return productId;
+        }
+
+        public string GetProductIdByItemIndex(int index)
+        {
+            // Locate the element by index and retrieve its text
+            string productId = Wait.UntilElementExists(ProductIdByItemIndex(index)).Text;
+            return productId;
+        }
+
 
         // Click on Item Ids
         public void ClickItemIdByLinkText(string text)
@@ -93,9 +156,9 @@ namespace PetStore.Pages
         }
 
         // Get SubTotal
-        public string GetSubTotal()
+        public double GetSubTotal()
         {
-            string subTot = Wait.UntilElementVisible(subTotal).Text;
+            double subTot = double.Parse(ClearSubTotalText(Wait.UntilElementVisible(subTotal).Text));
             return subTot;
         }
 

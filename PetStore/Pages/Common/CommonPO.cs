@@ -11,6 +11,8 @@ namespace PetStore.Pages.Common
 
         //header
         private readonly By signInLink = By.LinkText("Sign In");
+        private readonly By signOutLink = By.LinkText("Sign Out");
+        private readonly By myAccountLink = By.LinkText("My Account");
         private readonly By cartIcon = By.XPath("//img[contains(@src, 'cart')]");
         private readonly By helpIcon = By.XPath("//a[contains(@href, 'help')]");
         private readonly By logo = By.XPath("//img[contains(@src, 'logo')]");
@@ -30,6 +32,19 @@ namespace PetStore.Pages.Common
         private readonly By octoPerf2 = By.LinkText("https://octoperf.com");
         private readonly By mybatis = By.LinkText("www.mybatis.org");
         private static By SearchValue(string search) => By.XPath($"//td[contains(text(), '{search}')]");
+
+        public void ClickSignOutLink()
+        {
+            // Wait until the 'Sign Out' link is available and click it
+            Wait.UntilElementClickable(signOutLink).Click();
+        }
+
+        public void ClickMyAccountLink()
+        {
+            // Wait until the 'My Account' link is available and click it
+            Wait.UntilElementClickable(myAccountLink).Click();
+        }
+
 
         public void ClickFishNavbar()
         {

@@ -5,6 +5,7 @@ namespace PetStore.Pages
 {
     internal class PlaceOrderPO(IWebDriver driver) : BasePO(driver)
     {
+        private readonly By orderText = By.XPath("//div[@id='Catalog']");
         private readonly By confirmBtn = By.LinkText("Confirm");
         private readonly By returnToMainMenu = By.LinkText("Return to Main Menu");
         private readonly By timeOfPurchase = By.XPath("(//font/b)[2]");
@@ -26,6 +27,11 @@ namespace PetStore.Pages
         private readonly By shippingZip = By.XPath("(//td[text()='Zip:'])[2]/following-sibling::td");
         private readonly By shippingCountry = By.XPath("(//td[text()='Country:'])[2]/following-sibling::td");
 
+
+        public string GetOrderText()
+        {
+            return Wait.UntilElementVisible(orderText).Text;
+        }
         public string GetBillingFirstName()
         {
             string billFirstName = Wait.UntilElementVisible(billingFirstName).Text;

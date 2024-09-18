@@ -7,7 +7,7 @@ namespace PetStore.Tests
 {
     [TestClass]
     [TestCategory("ItemsPageTests")]
-    public class ItemsPageTestCases : BaseTests
+    public class ItemsPageTests : BaseTests
     {
         HomePO homePage;
         CommonPO commonPage;

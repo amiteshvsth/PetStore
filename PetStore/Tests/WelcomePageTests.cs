@@ -30,5 +30,17 @@ namespace PetStore.Tests
             string firstName = _welcomePage.GetFirstName();
             Assert.AreEqual("Welcome RwOnrA!", firstName);
         }
+
+        [TestMethod]
+        public void VerifyThatSignOutButtonIsWorking()
+        {
+            _commonPage.ClickSignInLink();
+            _signInPage.SignInUser("mAQyo6677", "lqYFkDr0WD");
+            string firstName = _welcomePage.GetFirstName();
+            Assert.AreEqual("Welcome RwOnrA!", firstName);
+            _welcomePage.SignOut();
+            _commonPage.ClickSignInLink();
+            Assert.IsTrue(Driver.Url.Equals("https://petstore.octoperf.com/actions/Account.action?signonForm="));
+        }
     }
 }

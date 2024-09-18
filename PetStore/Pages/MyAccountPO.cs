@@ -52,93 +52,96 @@ namespace PetStore.Pages
             ClickSubmitButton();
         }
 
-        public string GetUserId() { 
-            string userIdd = Wait.UntilElementExists(userIdField).Text;
-            return userIdd;
+        public string GetUserId()
+        {
+            string userId = Wait.UntilElementExists(userIdField).Text;
+            return userId;
         }
+
         public string GetNewPassword()
         {
-            string newPassword = Wait.UntilElementExists(newPasswordField).Text;
+            string newPassword = Wait.UntilElementExists(newPasswordField).GetAttribute("value");
             return newPassword;
         }
 
         public string GetRepeatedPassword()
         {
-            string repeatedPassword = Wait.UntilElementExists(repeatedPasswordField).Text;
+            string repeatedPassword = Wait.UntilElementExists(repeatedPasswordField).GetAttribute("value");
             return repeatedPassword;
         }
 
         public string GetFirstName()
         {
-            string firstName = Wait.UntilElementExists(firstNameField).Text;
+            string firstName = Wait.UntilElementExists(firstNameField).GetAttribute("value");
             return firstName;
         }
 
         public string GetLastName()
         {
-            string lastName = Wait.UntilElementExists(lastNameField).Text;
+            string lastName = Wait.UntilElementExists(lastNameField).GetAttribute("value");
             return lastName;
         }
 
         public string GetEmail()
         {
-            string email = Wait.UntilElementExists(emailField).Text;
+            string email = Wait.UntilElementExists(emailField).GetAttribute("value");
             return email;
         }
 
         public string GetPhone()
         {
-            string phone = Wait.UntilElementExists(phoneField).Text;
+            string phone = Wait.UntilElementExists(phoneField).GetAttribute("value");
             return phone;
         }
 
         public string GetAddress1()
         {
-            string address1 = Wait.UntilElementExists(address1Field).Text;
+            string address1 = Wait.UntilElementExists(address1Field).GetAttribute("value");
             return address1;
         }
 
         public string GetAddress2()
         {
-            string address2 = Wait.UntilElementExists(address2Field).Text;
+            string address2 = Wait.UntilElementExists(address2Field).GetAttribute("value");
             return address2;
         }
 
         public string GetCity()
         {
-            string city = Wait.UntilElementExists(cityField).Text;
+            string city = Wait.UntilElementExists(cityField).GetAttribute("value");
             return city;
         }
 
         public string GetState()
         {
-            string state = Wait.UntilElementExists(stateField).Text;
+            string state = Wait.UntilElementExists(stateField).GetAttribute("value");
             return state;
         }
 
         public string GetZip()
         {
-            string zip = Wait.UntilElementExists(zipField).Text;
+            string zip = Wait.UntilElementExists(zipField).GetAttribute("value");
             return zip;
         }
 
         public string GetCountry()
         {
-            string country = Wait.UntilElementExists(countryField).Text;
+            string country = Wait.UntilElementExists(countryField).GetAttribute("value");
             return country;
         }
 
         public string GetLanguagePreference()
         {
-            string languagePreference = Wait.UntilElementExists(languagePreferenceField).Text;
+            string languagePreference = Wait.UntilElementExists(languagePreferenceField).GetAttribute("value");
             return languagePreference;
         }
 
         public string GetFavouriteCategory()
         {
-            string favouriteCategory = Wait.UntilElementExists(favouriteCategoryField).Text;
+            string favouriteCategory = Wait.UntilElementExists(favouriteCategoryField).GetAttribute("value");
             return favouriteCategory;
         }
+
         public bool IsEnableMyListChecked()
         {
             bool isEnableMyListChecked = Wait.UntilElementExists(enableMyListField).Selected;
@@ -235,7 +238,7 @@ namespace PetStore.Pages
 
         public void SetEnableMyList(bool enable)
         {
-            if (enable != true)
+            if (enable == true)
             {
                 Wait.UntilElementClickable(enableMyListField).Click();
             }
@@ -243,7 +246,7 @@ namespace PetStore.Pages
 
         public void SetEnableMyBanner(bool enable)
         {
-            if (enable != true)
+            if (enable == true)
             {
                 Wait.UntilElementClickable(enableMyBannerField).Click();
             }

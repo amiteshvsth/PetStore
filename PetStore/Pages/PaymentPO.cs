@@ -27,10 +27,16 @@ namespace PetStore.Pages
             SelectElement select = new(cardTypeElem);
             select.SelectByText(type);
         }
+        public string GetCardType()
+        {
+            IWebElement cardTypeElem = Wait.UntilElementVisible(cardType);
+            SelectElement select = new(cardTypeElem);
+            return select.SelectedOption.Text;
+        }
 
         public string GetCardNumber()
         {
-            string cardNu = Wait.UntilElementExists(cardNumber).Text;
+            string cardNu = Wait.UntilElementExists(cardNumber).GetAttribute("value");
             return cardNu;
         }
         public void EnterCardNumber(string number)
@@ -40,7 +46,7 @@ namespace PetStore.Pages
 
         public string GetExpiryDate()
         {
-            string expiryDat = Wait.UntilElementExists(expiryDate).Text;
+            string expiryDat = Wait.UntilElementExists(expiryDate).GetAttribute("value");
             return expiryDat;
         }
 
@@ -51,7 +57,7 @@ namespace PetStore.Pages
 
         public string GetFirstName()
         {
-            string name = Wait.UntilElementExists(firstName).Text;
+            string name = Wait.UntilElementExists(firstName).GetAttribute("value");
             return name;
         }
 
@@ -62,7 +68,7 @@ namespace PetStore.Pages
 
         public string GetLastName()
         {
-            string last = Wait.UntilElementExists(lastName).Text;
+            string last = Wait.UntilElementExists(lastName).GetAttribute("value");
             return last;
         }
 
@@ -73,7 +79,7 @@ namespace PetStore.Pages
 
         public string GetAddress1()
         {
-            string adres1 = Wait.UntilElementExists(address1).Text;
+            string adres1 = Wait.UntilElementExists(address1).GetAttribute("value");
             return adres1;
         }
 
@@ -84,7 +90,7 @@ namespace PetStore.Pages
 
         public string GetAddress2()
         {
-            string adres2 = Wait.UntilElementExists(address2).Text;
+            string adres2 = Wait.UntilElementExists(address2).GetAttribute("value");
             return adres2;
         }
         public void EnterAddress2(string adres2)
@@ -94,7 +100,7 @@ namespace PetStore.Pages
 
         public string GetCity()
         {
-            string citi = Wait.UntilElementExists(city).Text;
+            string citi = Wait.UntilElementExists(city).GetAttribute("value");
             return citi;
         }
 
@@ -105,7 +111,7 @@ namespace PetStore.Pages
 
         public string GetState()
         {
-            string stat = Wait.UntilElementExists(state).Text;
+            string stat = Wait.UntilElementExists(state).GetAttribute("value");
             return stat;
         }
         public void EnterState(string stat)
@@ -115,7 +121,7 @@ namespace PetStore.Pages
 
         public string GetZip()
         {
-            string zeep = Wait.UntilElementExists(zip).Text;
+            string zeep = Wait.UntilElementExists(zip).GetAttribute("value");
             return zeep;
         }
 
@@ -126,7 +132,7 @@ namespace PetStore.Pages
 
         public string GetCountry()
         {
-            string contry = Wait.UntilElementExists(country).Text;
+            string contry = Wait.UntilElementExists(country).GetAttribute("value");
             return contry;
         }
         public void EnterCountry(string contry)
