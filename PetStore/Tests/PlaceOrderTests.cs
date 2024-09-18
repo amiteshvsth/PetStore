@@ -46,76 +46,111 @@ namespace PetStore.Tests
         public void VerifyThatAllDetailsAreSameAsFilledPreviously(string category)
         {
             commonPage.NavigateToCategory(category);
+
             List<string> subCatNames = productCategoryPage.GetAllSubCategories();
-            foreach (var item in subCatNames)
+
+            foreach (var subCategoryName in subCatNames)
             {
-                productCategoryPage.ClickOnSubCategoryByProductName(item);
-                Assert.IsTrue(itemsPage.GetSubCategory().Equals(item));
-                List<string> itemIds = itemsPage.GetAllItemIDs();
-                foreach (var itemId in itemIds)
-                {
-                    itemsPage.ClickOnItemByItemID(itemId);
-                    Assert.IsTrue(itemDetailsPage.GetItemId().Equals(itemId));
-
-                    itemDetailsPage.ClickOnAddToCartDetailsPage();
-                    cartPage.ClickProceedToCheckoutButton();
-                    Assert.IsTrue(Driver.Url.Contains("newOrderForm="));
-                    string paymentPagefirstName = paymentPage.GetFirstName();
-                    string paymentPagelastName = paymentPage.GetLastName();
-                    string paymentPageaddress1 = paymentPage.GetAddress1();
-                    string paymentPageaddress2 = paymentPage.GetAddress2();
-                    string paymentPagecity = paymentPage.GetCity();
-                    string paymentPagestate = paymentPage.GetState();
-                    string paymentPagezip = paymentPage.GetZip();
-                    string paymentPagecountry = paymentPage.GetCountry();
-                    paymentPage.ClickOnContinueButton();
-
-                    string placeOrderPageBillingFirstName = placeOrderPage.GetBillingFirstName();
-                    string placeOrderPageBillingLastName = placeOrderPage.GetBillingLastName();
-                    string placeOrderPageBillingAddress1 = placeOrderPage.GetBillingAddress1();
-                    string placeOrderPageBillingAddress2 = placeOrderPage.GetBillingAddress2();
-                    string placeOrderPageBillingCity = placeOrderPage.GetBillingCity();
-                    string placeOrderPageBillingState = placeOrderPage.GetBillingState();
-                    string placeOrderPageBillingZip = placeOrderPage.GetBillingZip();
-                    string placeOrderPageBillingCountry = placeOrderPage.GetBillingCountry();
-
-                    string placeOrderPageShippingFirstName = placeOrderPage.GetShippingFirstName();
-                    string placeOrderPageShippingLastName = placeOrderPage.GetShippingLastName();
-                    string placeOrderPageShippingAddress1 = placeOrderPage.GetShippingAddress1();
-                    string placeOrderPageShippingAddress2 = placeOrderPage.GetShippingAddress2();
-                    string placeOrderPageShippingCity = placeOrderPage.GetShippingCity();
-                    string placeOrderPageShippingState = placeOrderPage.GetShippingState();
-                    string placeOrderPageShippingZip = placeOrderPage.GetShippingZip();
-                    string placeOrderPageShippingCountry = placeOrderPage.GetShippingCountry();
-
-                    // Assert that payment page and billing page values are equal
-                    Assert.AreEqual(paymentPagefirstName, placeOrderPageBillingFirstName, "First names do not match between payment page and billing page.");
-                    Assert.AreEqual(paymentPagelastName, placeOrderPageBillingLastName, "Last names do not match between payment page and billing page.");
-                    Assert.AreEqual(paymentPageaddress1, placeOrderPageBillingAddress1, "Address1 values do not match between payment page and billing page.");
-                    Assert.AreEqual(paymentPageaddress2, placeOrderPageBillingAddress2, "Address2 values do not match between payment page and billing page.");
-                    Assert.AreEqual(paymentPagecity, placeOrderPageBillingCity, "City values do not match between payment page and billing page.");
-                    Assert.AreEqual(paymentPagestate, placeOrderPageBillingState, "State values do not match between payment page and billing page.");
-                    Assert.AreEqual(paymentPagezip, placeOrderPageBillingZip, "Zip codes do not match between payment page and billing page.");
-                    Assert.AreEqual(paymentPagecountry, placeOrderPageBillingCountry, "Country values do not match between payment page and billing page.");
-
-                    // Assert that payment page and shipping page values are equal
-                    Assert.AreEqual(paymentPagefirstName, placeOrderPageShippingFirstName, "First names do not match between payment page and shipping page.");
-                    Assert.AreEqual(paymentPagelastName, placeOrderPageShippingLastName, "Last names do not match between payment page and shipping page.");
-                    Assert.AreEqual(paymentPageaddress1, placeOrderPageShippingAddress1, "Address1 values do not match between payment page and shipping page.");
-                    Assert.AreEqual(paymentPageaddress2, placeOrderPageShippingAddress2, "Address2 values do not match between payment page and shipping page.");
-                    Assert.AreEqual(paymentPagecity, placeOrderPageShippingCity, "City values do not match between payment page and shipping page.");
-                    Assert.AreEqual(paymentPagestate, placeOrderPageShippingState, "State values do not match between payment page and shipping page.");
-                    Assert.AreEqual(paymentPagezip, placeOrderPageShippingZip, "Zip codes do not match between payment page and shipping page.");
-                    Assert.AreEqual(paymentPagecountry, placeOrderPageShippingCountry, "Country values do not match between payment page and shipping page.");
-
-                    Driver.Back();
-                    Driver.Back();
-                    Driver.Back();
-                    Driver.Back();
-                }
-                Driver.Back();
+                VerifySubCategoryDetails(subCategoryName);
             }
         }
+
+        private void VerifySubCategoryDetails(string subCategoryName)
+        {
+            string subCategoryUrl = Driver.Url;
+            productCategoryPage.ClickOnSubCategoryByProductName(subCategoryName);
+            Assert.IsTrue(itemsPage.GetSubCategory().Equals(subCategoryName));
+
+            List<string> itemIds = itemsPage.GetAllItemIDs();
+
+            foreach (var itemId in itemIds)
+            {
+                VerifyItemDetails(itemId);
+            }
+
+            Driver.NavigateTo(subCategoryUrl);
+        }
+
+        private void VerifyItemDetails(string itemId)
+        {
+            string itemsPageUrl = Driver.Url;
+            itemsPage.ClickOnItemByItemID(itemId);
+            Assert.IsTrue(itemDetailsPage.GetItemId().Equals(itemId));
+
+            itemDetailsPage.ClickOnAddToCartDetailsPage();
+            cartPage.ClickProceedToCheckoutButton();
+            Assert.IsTrue(Driver.Url.Contains("newOrderForm="));
+
+            var paymentDetails = GetPaymentDetails();
+            paymentPage.ClickOnContinueButton();
+
+            var billingDetails = GetBillingDetails();
+            var shippingDetails = GetShippingDetails();
+
+            AssertDetailsMatch(paymentDetails, billingDetails, "billing");
+            AssertDetailsMatch(paymentDetails, shippingDetails, "shipping");
+
+            Driver.NavigateTo(itemsPageUrl);
+        }
+
+        private dynamic GetPaymentDetails()
+        {
+            return new
+            {
+                FirstName = paymentPage.GetFirstName(),
+                LastName = paymentPage.GetLastName(),
+                Address1 = paymentPage.GetAddress1(),
+                Address2 = paymentPage.GetAddress2(),
+                City = paymentPage.GetCity(),
+                State = paymentPage.GetState(),
+                Zip = paymentPage.GetZip(),
+                Country = paymentPage.GetCountry()
+            };
+        }
+
+        private dynamic GetBillingDetails()
+        {
+            return new
+            {
+                FirstName = placeOrderPage.GetBillingFirstName(),
+                LastName = placeOrderPage.GetBillingLastName(),
+                Address1 = placeOrderPage.GetBillingAddress1(),
+                Address2 = placeOrderPage.GetBillingAddress2(),
+                City = placeOrderPage.GetBillingCity(),
+                State = placeOrderPage.GetBillingState(),
+                Zip = placeOrderPage.GetBillingZip(),
+                Country = placeOrderPage.GetBillingCountry()
+            };
+        }
+
+        private dynamic GetShippingDetails()
+        {
+            return new
+            {
+                FirstName = placeOrderPage.GetShippingFirstName(),
+                LastName = placeOrderPage.GetShippingLastName(),
+                Address1 = placeOrderPage.GetShippingAddress1(),
+                Address2 = placeOrderPage.GetShippingAddress2(),
+                City = placeOrderPage.GetShippingCity(),
+                State = placeOrderPage.GetShippingState(),
+                Zip = placeOrderPage.GetShippingZip(),
+                Country = placeOrderPage.GetShippingCountry()
+            };
+        }
+
+        private void AssertDetailsMatch(dynamic expected, dynamic actual, string label)
+        {
+            Assert.AreEqual(expected.FirstName, actual.FirstName, $"First names do not match between payment page and {label} page.");
+            Assert.AreEqual(expected.LastName, actual.LastName, $"Last names do not match between payment page and {label} page.");
+            Assert.AreEqual(expected.Address1, actual.Address1, $"Address1 values do not match between payment page and {label} page.");
+            Assert.AreEqual(expected.Address2, actual.Address2, $"Address2 values do not match between payment page and {label} page.");
+            Assert.AreEqual(expected.City, actual.City, $"City values do not match between payment page and {label} page.");
+            Assert.AreEqual(expected.State, actual.State, $"State values do not match between payment page and {label} page.");
+            Assert.AreEqual(expected.Zip, actual.Zip, $"Zip codes do not match between payment page and {label} page.");
+            Assert.AreEqual(expected.Country, actual.Country, $"Country values do not match between payment page and {label} page.");
+        }
+
+
 
 
         [TestMethod]
@@ -124,13 +159,16 @@ namespace PetStore.Tests
         {
             commonPage.NavigateToCategory(category);
             List<string> subCatNames = productCategoryPage.GetAllSubCategories();
+            string subCategoryPageUrl, itemPageUrl;
             foreach (var item in subCatNames)
             {
+                subCategoryPageUrl = Driver.Url;
                 productCategoryPage.ClickOnSubCategoryByProductName(item);
                 Assert.IsTrue(itemsPage.GetSubCategory().Equals(item));
                 List<string> itemIds = itemsPage.GetAllItemIDs();
                 foreach (var itemId in itemIds)
                 {
+                    itemPageUrl = Driver.Url;
                     itemsPage.ClickOnItemByItemID(itemId);
                     itemDetailsPage.ClickOnAddToCartDetailsPage();
                     cartPage.ClickProceedToCheckoutButton();
@@ -139,13 +177,9 @@ namespace PetStore.Tests
                     string thankYouText = thankYouPage.GetThankYouText();
                     Assert.AreEqual(thankYouText, "Thank you, your order has been submitted.");
 
-                    Driver.Back();
-                    Driver.Back();
-                    Driver.Back();
-                    Driver.Back();
-                    Driver.Back();
+                    Driver.NavigateTo(itemPageUrl);
                 }
-                Driver.Back();
+                Driver.NavigateTo(subCategoryPageUrl);
             }
         }
     }

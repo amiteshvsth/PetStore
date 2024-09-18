@@ -9,18 +9,28 @@ namespace PetStore.Tests
     [TestCategory("PaymentPageTests")]
     public class PaymentPageTests : BaseTests
     {
-        SignInPO signInPage;
-        CommonPO commonPage;
-        ProductCategoryPO productCategoryPage;
-        ItemsPO itemsPage;
-        ItemDetailsPO itemDetailsPage;
-        CartPO cartPage;
-        PaymentPO paymentPage;
-        MyAccountPO accountPage;
-        ShipToDifferentAddressPO shipToDifferentAddressPage;
-        PlaceOrderPO placeOrderPage;
+        private SignInPO signInPage;
+        private CommonPO commonPage;
+        private ProductCategoryPO productCategoryPage;
+        private ItemsPO itemsPage;
+        private ItemDetailsPO itemDetailsPage;
+        private CartPO cartPage;
+        private PaymentPO paymentPage;
+        private MyAccountPO accountPage;
+        private ShipToDifferentAddressPO shipToDifferentAddressPage;
+        private PlaceOrderPO placeOrderPage;
+
         [TestInitialize]
         public void PaymentPageTest()
+        {
+            InitializePageObjects();
+
+            Driver.NavigateTo(PetStoreUrl);
+            commonPage.ClickSignInLink();
+            signInPage.SignInUser("mAQyo6677", "lqYFkDr0WD");
+        }
+
+        private void InitializePageObjects()
         {
             signInPage = new SignInPO(Driver);
             productCategoryPage = new ProductCategoryPO(Driver);
@@ -32,181 +42,177 @@ namespace PetStore.Tests
             accountPage = new MyAccountPO(Driver);
             shipToDifferentAddressPage = new ShipToDifferentAddressPO(Driver);
             placeOrderPage = new PlaceOrderPO(Driver);
-
-            Driver.NavigateTo(PetStoreUrl);
-            commonPage.ClickSignInLink();
-            signInPage.SignInUser("mAQyo6677", "lqYFkDr0WD");
         }
 
         [TestMethod]
         [DynamicData(nameof(CommonPO.GetAllCategories), typeof(CommonPO), DynamicDataSourceType.Method)]
         public void VerifyThatBillingAddressIsCorrect(string category)
         {
-            commonPage.NavigateToCategory(category);
-            List<string> subCatNames = productCategoryPage.GetAllSubCategories();
-            foreach (var item in subCatNames)
-            {
-                productCategoryPage.ClickOnSubCategoryByProductName(item);
-                Assert.IsTrue(itemsPage.GetSubCategory().Equals(item));
-                List<string> itemIds = itemsPage.GetAllItemIDs();
-                foreach (var itemId in itemIds)
-                {
-                    itemsPage.ClickOnItemByItemID(itemId);
-                    Assert.IsTrue(itemDetailsPage.GetItemId().Equals(itemId));
-
-                    itemDetailsPage.ClickOnAddToCartDetailsPage();
-                    cartPage.ClickProceedToCheckoutButton();
-                    Assert.IsTrue(Driver.Url.Contains("newOrderForm="));
-                    string paymentPagefirstName = paymentPage.GetFirstName();
-                    string paymentPagelastName = paymentPage.GetLastName();
-                    string paymentPageaddress1 = paymentPage.GetAddress1();
-                    string paymentPageaddress2 = paymentPage.GetAddress2();
-                    string paymentPagecity = paymentPage.GetCity();
-                    string paymentPagestate = paymentPage.GetState();
-                    string paymentPagezip = paymentPage.GetZip();
-                    string paymentPagecountry = paymentPage.GetCountry();
-                    commonPage.ClickMyAccountLink();
-                    string accountPageFirstName = accountPage.GetFirstName();
-                    string accountPageLastName = accountPage.GetLastName();
-                    string accountPageAddress1 = accountPage.GetAddress1();
-                    string accountPageAddress2 = accountPage.GetAddress2();
-                    string accountPageCity = accountPage.GetCity();
-                    string accountPageState = accountPage.GetState();
-                    string accountPageZip = accountPage.GetZip();
-                    string accountPageCountry = accountPage.GetCountry();
-
-                    Assert.AreEqual(accountPageFirstName, paymentPagefirstName, "First names do not match.");
-                    Assert.AreEqual(accountPageLastName, paymentPagelastName, "Last names do not match.");
-                    Assert.AreEqual(accountPageAddress1, paymentPageaddress1, "Address1 values do not match.");
-                    Assert.AreEqual(accountPageAddress2, paymentPageaddress2, "Address2 values do not match.");
-                    Assert.AreEqual(accountPageCity, paymentPagecity, "City values do not match.");
-                    Assert.AreEqual(accountPageState, paymentPagestate, "State values do not match.");
-                    Assert.AreEqual(accountPageZip, paymentPagezip, "Zip codes do not match.");
-                    Assert.AreEqual(accountPageCountry, paymentPagecountry, "Country values do not match.");
-
-
-                    Driver.Back();
-                    Driver.Back();
-                    Driver.Back();
-                    Driver.Back();
-                }
-                Driver.Back();
-            }
+            ProcessItemsInCategory(category, VerifyBillingAddress);
         }
+
+        private void VerifyBillingAddress(string itemId, string itemPageUrl)
+        {
+            AddItemToCartAndProceedToCheckout();
+
+            var paymentPageDetails = GetAddressDetailsFromPaymentPage();
+            commonPage.ClickMyAccountLink();
+            var accountPageDetails = GetAddressDetailsFromAccountPage();
+
+            VerifyAddressDetails(paymentPageDetails, accountPageDetails);
+
+            Driver.NavigateTo(itemPageUrl);
+        }
+
+        private (string firstName, string lastName, string address1, string address2, string city, string state, string zip, string country)
+        GetAddressDetailsFromPaymentPage() => (
+            paymentPage.GetFirstName(),
+            paymentPage.GetLastName(),
+            paymentPage.GetAddress1(),
+            paymentPage.GetAddress2(),
+            paymentPage.GetCity(),
+            paymentPage.GetState(),
+            paymentPage.GetZip(),
+            paymentPage.GetCountry()
+        );
+
+        private (string firstName, string lastName, string address1, string address2, string city, string state, string zip, string country)
+        GetAddressDetailsFromAccountPage() => (
+            accountPage.GetFirstName(),
+            accountPage.GetLastName(),
+            accountPage.GetAddress1(),
+            accountPage.GetAddress2(),
+            accountPage.GetCity(),
+            accountPage.GetState(),
+            accountPage.GetZip(),
+            accountPage.GetCountry()
+        );
 
         [TestMethod]
         [DynamicData(nameof(CommonPO.GetAllCategories), typeof(CommonPO), DynamicDataSourceType.Method)]
         public void VerifyThatShipToDifferentAddressIsClickable(string category)
         {
-            commonPage.NavigateToCategory(category);
-            List<string> subCatNames = productCategoryPage.GetAllSubCategories();
-            foreach (var item in subCatNames)
-            {
-                productCategoryPage.ClickOnSubCategoryByProductName(item);
-                Assert.IsTrue(itemsPage.GetSubCategory().Equals(item));
-                List<string> itemIds = itemsPage.GetAllItemIDs();
-                foreach (var itemId in itemIds)
-                {
-                    itemsPage.ClickOnItemByItemID(itemId);
-                    Assert.IsTrue(itemDetailsPage.GetItemId().Equals(itemId));
+            ProcessItemsInCategory(category, VerifyShipToDifferentAddress);
+        }
 
-                    itemDetailsPage.ClickOnAddToCartDetailsPage();
-                    cartPage.ClickProceedToCheckoutButton();
-                    Assert.IsTrue(Driver.Url.Contains("newOrderForm="));
-                    paymentPage.ClickOnShipToDifferentAddress();
-                    paymentPage.ClickOnContinueButton();
-                    Assert.IsTrue(shipToDifferentAddressPage.GetHeading().Equals("Shipping Address"));
+        private void VerifyShipToDifferentAddress(string itemId, string itemPageUrl)
+        {
+            AddItemToCartAndProceedToCheckout();
 
-                    Driver.Back();
-                    Driver.Back();
-                    Driver.Back();
-                    Driver.Back();
-                }
-                Driver.Back();
-            }
+            paymentPage.ClickOnShipToDifferentAddress();
+            paymentPage.ClickOnContinueButton();
+            Assert.IsTrue(shipToDifferentAddressPage.GetHeading().Equals("Shipping Address"));
+
+            Driver.NavigateTo(itemPageUrl);
         }
 
         [TestMethod]
         [DynamicData(nameof(CommonPO.GetAllCategories), typeof(CommonPO), DynamicDataSourceType.Method)]
         public void VerifyThatContinueButtonIsClickable(string category)
         {
-            commonPage.NavigateToCategory(category);
-            List<string> subCatNames = productCategoryPage.GetAllSubCategories();
-            foreach (var item in subCatNames)
-            {
-                productCategoryPage.ClickOnSubCategoryByProductName(item);
-                Assert.IsTrue(itemsPage.GetSubCategory().Equals(item));
-                List<string> itemIds = itemsPage.GetAllItemIDs();
-                foreach (var itemId in itemIds)
-                {
-                    itemsPage.ClickOnItemByItemID(itemId);
-                    Assert.IsTrue(itemDetailsPage.GetItemId().Equals(itemId));
+            ProcessItemsInCategory(category, VerifyContinueButton);
+        }
 
-                    itemDetailsPage.ClickOnAddToCartDetailsPage();
-                    cartPage.ClickProceedToCheckoutButton();
-                    Assert.IsTrue(Driver.Url.Contains("newOrderForm="));
-                    paymentPage.ClickOnContinueButton();
-                    string orderText = placeOrderPage.GetOrderText();
-                    Assert.IsTrue(orderText.Contains("Please confirm the information below and then press continue..."));
+        private void VerifyContinueButton(string itemId, string itemPageUrl)
+        {
+            AddItemToCartAndProceedToCheckout();
 
-                    Driver.Back();
-                    Driver.Back();
-                    Driver.Back();
-                    Driver.Back();
-                }
-                Driver.Back();
-            }
+            paymentPage.ClickOnContinueButton();
+            Assert.IsTrue(placeOrderPage.GetOrderText().Contains("Please confirm the information below and then press continue..."));
+
+            Driver.NavigateTo(itemPageUrl);
         }
 
         [TestMethod]
         [DynamicData(nameof(CommonPO.GetAllCategories), typeof(CommonPO), DynamicDataSourceType.Method)]
         public void VerifyThatDefaultInformationCanBeChanged(string category)
         {
+            ProcessItemsInCategory(category, ChangeAndVerifyPaymentDetails);
+        }
+
+        private void ChangeAndVerifyPaymentDetails(string itemId, string itemPageUrl)
+        {
+            AddItemToCartAndProceedToCheckout();
+
+            paymentPage.SelectCardType("MasterCard");
+            paymentPage.EnterCardNumber("00008838239");
+            paymentPage.EnterExpiryDate("10/05");
+            paymentPage.EnterFirstName("Amitesh");
+            paymentPage.EnterLastName("Rawal");
+            paymentPage.EnterAddress1("nikol");
+            paymentPage.EnterAddress2("jignect");
+            paymentPage.EnterCity("odhav");
+            paymentPage.EnterState("gujarat");
+            paymentPage.EnterZip("398080");
+            paymentPage.EnterCountry("India");
+
+            AssertPaymentDetails("MasterCard", "00008838239", "10/05", "Amitesh", "Rawal", "nikol", "jignect", "odhav", "gujarat", "398080", "India");
+
+            Driver.NavigateTo(itemPageUrl);
+        }
+
+        private void AssertPaymentDetails(
+            string expectedCardType, string expectedCardNumber, string expectedExpiryDate,
+            string expectedFirstName, string expectedLastName, string expectedAddress1, string expectedAddress2,
+            string expectedCity, string expectedState, string expectedZip, string expectedCountry)
+        {
+            Assert.AreEqual(paymentPage.GetCardType(), expectedCardType);
+            Assert.AreEqual(paymentPage.GetCardNumber(), expectedCardNumber);
+            Assert.AreEqual(paymentPage.GetExpiryDate(), expectedExpiryDate);
+            Assert.AreEqual(paymentPage.GetFirstName(), expectedFirstName);
+            Assert.AreEqual(paymentPage.GetLastName(), expectedLastName);
+            Assert.AreEqual(paymentPage.GetAddress1(), expectedAddress1);
+            Assert.AreEqual(paymentPage.GetAddress2(), expectedAddress2);
+            Assert.AreEqual(paymentPage.GetCity(), expectedCity);
+            Assert.AreEqual(paymentPage.GetState(), expectedState);
+            Assert.AreEqual(paymentPage.GetZip(), expectedZip);
+            Assert.AreEqual(paymentPage.GetCountry(), expectedCountry);
+        }
+
+        private void AddItemToCartAndProceedToCheckout()
+        {
+            itemDetailsPage.ClickOnAddToCartDetailsPage();
+            cartPage.ClickProceedToCheckoutButton();
+            Assert.IsTrue(Driver.Url.Contains("newOrderForm="));
+        }
+
+        private void ProcessItemsInCategory(string category, Action<string, string> actionPerItem)
+        {
             commonPage.NavigateToCategory(category);
             List<string> subCatNames = productCategoryPage.GetAllSubCategories();
-            foreach (var item in subCatNames)
+
+            foreach (var subCategory in subCatNames)
             {
-                productCategoryPage.ClickOnSubCategoryByProductName(item);
-                Assert.IsTrue(itemsPage.GetSubCategory().Equals(item));
+                string subCategoryPageUrl = Driver.Url;
+                productCategoryPage.ClickOnSubCategoryByProductName(subCategory);
+                Assert.IsTrue(itemsPage.GetSubCategory().Equals(subCategory));
+
                 List<string> itemIds = itemsPage.GetAllItemIDs();
                 foreach (var itemId in itemIds)
                 {
+                    string itemPageUrl = Driver.Url;
                     itemsPage.ClickOnItemByItemID(itemId);
                     Assert.IsTrue(itemDetailsPage.GetItemId().Equals(itemId));
 
-                    itemDetailsPage.ClickOnAddToCartDetailsPage();
-                    cartPage.ClickProceedToCheckoutButton();
-                    Assert.IsTrue(Driver.Url.Contains("newOrderForm="));
-                    paymentPage.SelectCardType("MasterCard");
-                    paymentPage.EnterCardNumber("00008838239");
-                    paymentPage.EnterExpiryDate("10/05");
-                    paymentPage.EnterFirstName("Amitesh");
-                    paymentPage.EnterLastName("Rawal");
-                    paymentPage.EnterAddress1("nikol");
-                    paymentPage.EnterAddress2("jignect");
-                    paymentPage.EnterCity("odhav");
-                    paymentPage.EnterState("gujarat");
-                    paymentPage.EnterZip("398080");
-                    paymentPage.EnterCountry("India");
-
-                    Assert.AreEqual(paymentPage.GetCardType(), "MasterCard");
-                    Assert.AreEqual(paymentPage.GetCardNumber(), "00008838239");
-                    Assert.AreEqual(paymentPage.GetExpiryDate(), "10/05");
-                    Assert.AreEqual(paymentPage.GetFirstName(), "Amitesh");
-                    Assert.AreEqual(paymentPage.GetLastName(), "Rawal");
-                    Assert.AreEqual(paymentPage.GetAddress1(), "nikol");
-                    Assert.AreEqual(paymentPage.GetAddress2(), "jignect");
-                    Assert.AreEqual(paymentPage.GetCity(), "odhav");
-                    Assert.AreEqual(paymentPage.GetState(), "gujarat");
-                    Assert.AreEqual(paymentPage.GetZip(), "398080");
-                    Assert.AreEqual(paymentPage.GetCountry(), "India");
-
-                    Driver.Back();
-                    Driver.Back();
-                    Driver.Back();
+                    actionPerItem(itemId, itemPageUrl);
                 }
-                Driver.Back();
+
+                Driver.NavigateTo(subCategoryPageUrl);
             }
+        }
+
+        private static void VerifyAddressDetails(
+            (string firstName, string lastName, string address1, string address2, string city, string state, string zip, string country) paymentPageDetails,
+            (string firstName, string lastName, string address1, string address2, string city, string state, string zip, string country) accountPageDetails)
+        {
+            Assert.AreEqual(accountPageDetails.firstName, paymentPageDetails.firstName, "First names do not match.");
+            Assert.AreEqual(accountPageDetails.lastName, paymentPageDetails.lastName, "Last names do not match.");
+            Assert.AreEqual(accountPageDetails.address1, paymentPageDetails.address1, "Address1 values do not match.");
+            Assert.AreEqual(accountPageDetails.address2, paymentPageDetails.address2, "Address2 values do not match.");
+            Assert.AreEqual(accountPageDetails.city, paymentPageDetails.city, "City values do not match.");
+            Assert.AreEqual(accountPageDetails.state, paymentPageDetails.state, "State values do not match.");
+            Assert.AreEqual(accountPageDetails.zip, paymentPageDetails.zip, "Zip codes do not match.");
+            Assert.AreEqual(accountPageDetails.country, paymentPageDetails.country, "Country values do not match.");
         }
     }
 }

@@ -29,7 +29,7 @@ namespace PetStore.Tests
             Driver.NavigateTo(PetStoreUrl);
         }
 
-        
+
 
         private void VerifyReturnToCategory(string category)
         {

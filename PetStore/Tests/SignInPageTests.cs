@@ -5,8 +5,6 @@ using PetStore.DataObject;
 using PetStore.Pages;
 using PetStore.Pages.Common;
 using PetStore.utilities;
-using System.IO;
-using System.Linq;
 
 namespace PetStore.Tests
 {
@@ -31,7 +29,7 @@ namespace PetStore.Tests
             signInData = LoadSignInData(SignInDataPath);
         }
 
-        private SignInList LoadSignInData(string path)
+        private static SignInList LoadSignInData(string path)
         {
             return JsonConvert.DeserializeObject<SignInList>(File.ReadAllText(path));
         }
@@ -48,8 +46,9 @@ namespace PetStore.Tests
             foreach (var user in signInData.SignInDataModels)
             {
                 NavigateToSignInPage();
+                Console.WriteLine(user.UserId);
                 signInPage.SignInUser(user.UserId, user.Password);
-                welcomePage.SignOut();
+                Assert.IsTrue(welcomePage.SignOut());
             }
         }
 

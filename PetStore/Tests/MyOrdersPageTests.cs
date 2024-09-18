@@ -13,6 +13,7 @@ namespace PetStore.Tests
         CommonPO commonPage;
         MyAccountPO myAccountPage;
         MyOrdersPO myOrdersPage;
+        private List<string> orderIds;
         [TestInitialize]
         public void MyOrdersPage()
         {
@@ -25,12 +26,12 @@ namespace PetStore.Tests
             signInPage.SignInUser("mAQyo6677", "lqYFkDr0WD");
             commonPage.ClickMyAccountLink();
             myAccountPage.ClickMyOrdersLink();
+            orderIds = myOrdersPage.GetAllOrderIds();
         }
 
         [TestMethod]
         public void VerifyThatOrderIdIsClickable()
         {
-            List<string> orderIds = myOrdersPage.GetAllOrderIds();
             foreach (var orderId in orderIds)
             {
                 myOrdersPage.ClickOrderIdByText(orderId);
@@ -40,9 +41,7 @@ namespace PetStore.Tests
         }
 
         [TestMethod]
-        public void VerifyThatTotalPriceIsNotZero()
-        {
-            List<string> orderIds = myOrdersPage.GetAllOrderIds();
+        public void VerifyThatTotalPriceIsNotZero() { 
             foreach (var orderId in orderIds)
             {
                 string orderTotal = myOrdersPage.GetOrderTotalById(orderId);
@@ -53,7 +52,6 @@ namespace PetStore.Tests
         [TestMethod]
         public void VerifyThatDateIsInCorrectFormat()
         {
-            List<string> orderIds = myOrdersPage.GetAllOrderIds();
             foreach (var orderId in orderIds)
             {
                 string orderTime = myOrdersPage.GetOrderTimeById(orderId);

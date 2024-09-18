@@ -16,9 +16,10 @@ namespace PetStore.Pages
             Wait.UntilElementClickable(myAccountLink).Click();
         }
 
-        public void SignOut()
+        public bool SignOut()
         {
             Wait.UntilElementClickable(signOutLink).Click();
+            return true;
         }
 
         public string GetFirstName()

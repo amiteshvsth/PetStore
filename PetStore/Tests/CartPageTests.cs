@@ -40,22 +40,24 @@ namespace PetStore.Tests
         {
             commonPage.NavigateToCategory(category);
             List<string> subCatNames = productCategoryPage.GetAllSubCategories();
+            string subCategoryPageUrl, itemPageUrl;
             foreach (var item in subCatNames)
             {
+                subCategoryPageUrl = Driver.Url;
                 productCategoryPage.ClickOnSubCategoryByProductName(item);
                 Assert.IsTrue(itemsPage.GetSubCategory().Equals(item));
                 List<string> itemIds = itemsPage.GetAllItemIDs();
                 foreach (var itemId in itemIds)
                 {
+                    itemPageUrl = Driver.Url;
                     itemsPage.ClickOnItemByItemID(itemId);
                     Assert.IsTrue(itemDetailsPage.GetItemId().Equals(itemId));
                     itemDetailsPage.ClickOnAddToCartDetailsPage();
                     List<string> items = cartPage.GetAllItemId();
                     Assert.IsTrue(items.Contains(itemId));
-                    Driver.Back();
-                    Driver.Back();
+                    Driver.NavigateTo(itemPageUrl);
                 }
-                Driver.Back();
+                Driver.NavigateTo(subCategoryPageUrl);
             }
         }
 
@@ -65,14 +67,17 @@ namespace PetStore.Tests
         {
             commonPage.NavigateToCategory(category);
             List<string> subCatNames = productCategoryPage.GetAllSubCategories();
+            string subCategoryPageUrl, itemPageUrl;
             foreach (var item in subCatNames)
             {
+                subCategoryPageUrl = Driver.Url;
                 int itemQuantity, newItemQuantity;
                 productCategoryPage.ClickOnSubCategoryByProductName(item);
                 Assert.IsTrue(itemsPage.GetSubCategory().Equals(item));
                 List<string> itemIds = itemsPage.GetAllItemIDs();
                 foreach (var itemId in itemIds)
                 {
+                    itemPageUrl = Driver.Url;
                     itemsPage.ClickOnItemByItemID(itemId);
                     Assert.IsTrue(itemDetailsPage.GetItemId().Equals(itemId));
                     itemDetailsPage.ClickOnAddToCartDetailsPage();
@@ -83,12 +88,9 @@ namespace PetStore.Tests
                     itemDetailsPage.ClickOnAddToCartDetailsPage();
                     newItemQuantity = int.Parse(cartPage.GetQuantityByItemID(itemId));
                     Assert.AreEqual(newItemQuantity, itemQuantity + 1);
-                    Driver.Back();
-                    Driver.Back();
-                    Driver.Back();
-                    Driver.Back();
+                    Driver.NavigateTo(itemPageUrl);
                 }
-                Driver.Back();
+                Driver.NavigateTo(subCategoryPageUrl);
             }
         }
 
@@ -98,14 +100,17 @@ namespace PetStore.Tests
         {
             commonPage.NavigateToCategory(category);
             List<string> subCatNames = productCategoryPage.GetAllSubCategories();
+            string subCategoryPageUrl, itemPageUrl;
             foreach (var item in subCatNames)
             {
+                subCategoryPageUrl = Driver.Url;
                 productCategoryPage.ClickOnSubCategoryByProductName(item);
                 Assert.IsTrue(itemsPage.GetSubCategory().Equals(item));
                 List<string> itemIds = itemsPage.GetAllItemIDs();
                 string prodIdAtItemsPage, prodIdAtCartPage;
                 foreach (var itemId in itemIds)
                 {
+                    itemPageUrl = Driver.Url;
                     prodIdAtItemsPage = itemsPage.GetProductIdByItemId(itemId);
                     itemsPage.ClickOnItemByItemID(itemId);
                     Assert.IsTrue(itemDetailsPage.GetItemId().Equals(itemId));
@@ -116,10 +121,9 @@ namespace PetStore.Tests
                     //List<string> prodIds = cartPage.GetAllProductIds();
                     Assert.IsTrue(items.Contains(itemId));
                     Assert.IsTrue(prodIdAtCartPage.Equals(prodIdAtItemsPage));
-                    Driver.Back();
-                    Driver.Back();
+                    Driver.NavigateTo(itemPageUrl);
                 }
-                Driver.Back();
+                Driver.NavigateTo(subCategoryPageUrl);
             }
         }
 
@@ -129,14 +133,18 @@ namespace PetStore.Tests
         {
             commonPage.NavigateToCategory(category);
             List<string> subCatNames = productCategoryPage.GetAllSubCategories();
+            string subCategoryPageUrl, itemPageUrl;
+
             foreach (var item in subCatNames)
             {
+                subCategoryPageUrl = Driver.Url;
                 productCategoryPage.ClickOnSubCategoryByProductName(item);
                 Assert.IsTrue(itemsPage.GetSubCategory().Equals(item));
                 List<string> itemIds = itemsPage.GetAllItemIDs();
                 string itemPriceAtItemsPage, itemPriceAtCartPage;
                 foreach (var itemId in itemIds)
                 {
+                    itemPageUrl = Driver.Url;
                     itemsPage.ClickOnItemByItemID(itemId);
                     Assert.IsTrue(itemDetailsPage.GetItemId().Equals(itemId));
                     itemPriceAtItemsPage = itemDetailsPage.GetItemPrice();
@@ -148,10 +156,9 @@ namespace PetStore.Tests
                     //List<string> prodIds = cartPage.GetAllProductIds();
                     Assert.IsTrue(items.Contains(itemId));
                     Assert.IsTrue(itemPriceAtCartPage.Equals(itemPriceAtItemsPage));
-                    Driver.Back();
-                    Driver.Back();
+                    Driver.NavigateTo(itemPageUrl);
                 }
-                Driver.Back();
+                Driver.NavigateTo(subCategoryPageUrl);
             }
         }
 
@@ -161,8 +168,10 @@ namespace PetStore.Tests
         {
             commonPage.NavigateToCategory(category);
             List<string> subCatNames = productCategoryPage.GetAllSubCategories();
+            string subCategoryPageUrl, itemPageUrl;
             foreach (var item in subCatNames)
             {
+                subCategoryPageUrl = Driver.Url;
                 productCategoryPage.ClickOnSubCategoryByProductName(item);
                 Assert.IsTrue(itemsPage.GetSubCategory().Equals(item));
                 List<string> itemIds = itemsPage.GetAllItemIDs();
@@ -171,6 +180,7 @@ namespace PetStore.Tests
                 double totalPriceAtCartPage;
                 foreach (var itemId in itemIds)
                 {
+                    itemPageUrl = Driver.Url;
                     itemsPage.ClickOnItemByItemID(itemId);
                     Assert.IsTrue(itemDetailsPage.GetItemId().Equals(itemId));
 
@@ -183,10 +193,9 @@ namespace PetStore.Tests
                     string totalPrice = RemoveDollarSign(cartPage.GetTotalPriceById(itemId));
                     totalPriceAtCartPage = double.Parse(totalPrice);
                     Assert.AreEqual(itemPriceAtCartPage * itemQuantityAtCartPage, totalPriceAtCartPage);
-                    Driver.Back();
-                    Driver.Back();
+                    Driver.NavigateTo(itemPageUrl);
                 }
-                Driver.Back();
+                Driver.NavigateTo(subCategoryPageUrl);
             }
         }
 
@@ -196,29 +205,31 @@ namespace PetStore.Tests
         {
             commonPage.NavigateToCategory(category);
             List<string> subCatNames = productCategoryPage.GetAllSubCategories();
+            string subCategoryPageUrl, itemPageUrl;
+
             foreach (var item in subCatNames)
             {
+                subCategoryPageUrl = Driver.Url;
                 productCategoryPage.ClickOnSubCategoryByProductName(item);
                 Assert.IsTrue(itemsPage.GetSubCategory().Equals(item));
                 List<string> itemIds = itemsPage.GetAllItemIDs();
                 foreach (var itemId in itemIds)
                 {
+                    itemPageUrl = Driver.Url;
                     itemsPage.ClickOnItemByItemID(itemId);
                     Assert.IsTrue(itemDetailsPage.GetItemId().Equals(itemId));
 
                     itemDetailsPage.ClickOnAddToCartDetailsPage();
-                    cartPage.SetQuantityByItemID(itemId,"23");
+                    cartPage.SetQuantityByItemID(itemId, "23");
                     cartPage.ClickOnUpdateCartButton();
                     double priceAtCartPage = double.Parse(RemoveDollarSign(cartPage.GetListPriceById(itemId)));
                     double quantityAtCartPage = double.Parse(cartPage.GetQuantityByItemID(itemId));
-                    double total = Math.Round(priceAtCartPage*quantityAtCartPage,2);
+                    double total = Math.Round(priceAtCartPage * quantityAtCartPage, 2);
                     double totalAtCartPage = double.Parse(RemoveDollarSign(cartPage.GetTotalPriceById(itemId)));
                     Assert.AreEqual(total, totalAtCartPage);
-                    Driver.Back();
-                    Driver.Back();
-                    Driver.Back();
+                    Driver.NavigateTo(itemPageUrl);
                 }
-                Driver.Back();
+                Driver.NavigateTo(subCategoryPageUrl);
             }
         }
 
@@ -228,14 +239,17 @@ namespace PetStore.Tests
         {
             commonPage.NavigateToCategory(category);
             List<string> subCatNames = productCategoryPage.GetAllSubCategories();
+            string subCategoryPageUrl, itemPageUrl;
             foreach (var item in subCatNames)
             {
+                subCategoryPageUrl = Driver.Url;
                 productCategoryPage.ClickOnSubCategoryByProductName(item);
                 Assert.IsTrue(itemsPage.GetSubCategory().Equals(item));
                 List<string> itemIds = itemsPage.GetAllItemIDs();
                 string itemNameAtItemsPage, itemNameAtCartPage;
                 foreach (var itemId in itemIds)
                 {
+                    itemPageUrl = Driver.Url;
                     itemsPage.ClickOnItemByItemID(itemId);
                     itemNameAtItemsPage = itemDetailsPage.GetItemName();
                     itemDetailsPage.ClickOnAddToCartDetailsPage();
@@ -243,10 +257,9 @@ namespace PetStore.Tests
 
                     itemNameAtCartPage = cartPage.GetItemNameByID(itemId);
                     Assert.IsTrue(itemNameAtItemsPage.Equals(itemNameAtCartPage));
-                    Driver.Back();
-                    Driver.Back();
+                    Driver.NavigateTo(itemPageUrl);
                 }
-                Driver.Back();
+                Driver.NavigateTo(subCategoryPageUrl);
             }
         }
 
@@ -256,22 +269,24 @@ namespace PetStore.Tests
         {
             commonPage.NavigateToCategory(category);
             List<string> subCatNames = productCategoryPage.GetAllSubCategories();
+            string subCategoryPageUrl, itemPageUrl;
             foreach (var item in subCatNames)
             {
+                subCategoryPageUrl = Driver.Url;
                 productCategoryPage.ClickOnSubCategoryByProductName(item);
                 Assert.IsTrue(itemsPage.GetSubCategory().Equals(item));
                 List<string> itemIds = itemsPage.GetAllItemIDs();
-                
+
                 foreach (var itemId in itemIds)
                 {
+                    itemPageUrl = Driver.Url;
                     itemsPage.ClickOnItemByItemID(itemId);
                     itemDetailsPage.ClickOnAddToCartDetailsPage();
                     double subtotal = cartPage.GetSubTotal();
                     Assert.AreEqual(subtotal, cartPage.GetSubTotalByCalculation());
-                    Driver.Back();
-                    Driver.Back();
+                    Driver.NavigateTo(itemPageUrl);
                 }
-                Driver.Back();
+                Driver.NavigateTo(subCategoryPageUrl);
             }
         }
 
@@ -281,14 +296,17 @@ namespace PetStore.Tests
         {
             commonPage.NavigateToCategory(category);
             List<string> subCatNames = productCategoryPage.GetAllSubCategories();
+            string subCategoryPageUrl, itemPageUrl;
             foreach (var item in subCatNames)
             {
+                subCategoryPageUrl = Driver.Url;
                 productCategoryPage.ClickOnSubCategoryByProductName(item);
                 Assert.IsTrue(itemsPage.GetSubCategory().Equals(item));
                 List<string> itemIds = itemsPage.GetAllItemIDs();
 
                 foreach (var itemId in itemIds)
                 {
+                    itemPageUrl = Driver.Url;
                     itemsPage.ClickOnItemByItemID(itemId);
                     itemDetailsPage.ClickOnAddToCartDetailsPage();
                     cartPage.ClickOnRemoveButtonByItemId(itemId);
@@ -303,11 +321,9 @@ namespace PetStore.Tests
                         // No elements found, which is the expected outcome
                         Assert.IsTrue(true);
                     }
-                    Driver.Back();
-                    Driver.Back();
-                    Driver.Back();
+                    Driver.NavigateTo(itemPageUrl);
                 }
-                Driver.Back();
+                Driver.NavigateTo(subCategoryPageUrl);
             }
         }
 
@@ -317,13 +333,16 @@ namespace PetStore.Tests
         {
             commonPage.NavigateToCategory(category);
             List<string> subCatNames = productCategoryPage.GetAllSubCategories();
+            string subCategoryPageUrl, itemPageUrl;
             foreach (var item in subCatNames)
             {
+                subCategoryPageUrl = Driver.Url;
                 productCategoryPage.ClickOnSubCategoryByProductName(item);
                 Assert.IsTrue(itemsPage.GetSubCategory().Equals(item));
                 List<string> itemIds = itemsPage.GetAllItemIDs();
                 foreach (var itemId in itemIds)
                 {
+                    itemPageUrl = Driver.Url;
                     itemsPage.ClickOnItemByItemID(itemId);
                     Assert.IsTrue(itemDetailsPage.GetItemId().Equals(itemId));
 
@@ -332,12 +351,9 @@ namespace PetStore.Tests
                     cartPage.ClickOnUpdateCartButton();
                     cartPage.ClickProceedToCheckoutButton();
                     Assert.IsTrue(Driver.Url.Contains("newOrderForm="));
-                    Driver.Back();
-                    Driver.Back();
-                    Driver.Back();
-                    Driver.Back();
+                    Driver.NavigateTo(itemPageUrl);
                 }
-                Driver.Back();
+                Driver.NavigateTo(subCategoryPageUrl);
             }
         }
     }

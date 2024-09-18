@@ -9,47 +9,57 @@ namespace PetStore.Tests
     [TestCategory("productCategoryPageTests")]
     public class ProductCategoryPageTests : BaseTests
     {
-        HomePO homePage;
-        ProductCategoryPO productCategoryPage;
-        ItemsPO itemsPage;
+        private HomePO homePage;
+        private ProductCategoryPO productCategoryPage;
+        private ItemsPO itemsPage;
+
         [TestInitialize]
-        public void ProductCategoryTest() {
+        public void ProductCategoryPageTest()
+        {
             homePage = new HomePO(Driver);
             productCategoryPage = new ProductCategoryPO(Driver);
             itemsPage = new ItemsPO(Driver);
             Driver.NavigateTo(PetStoreUrl);
         }
 
+        private void NavigateToCategory(string page)
+        {
+            homePage.ClickCategoryImage(page);
+            Assert.IsTrue(Driver.Url.Contains(page), $"URL does not contain {page}");
+        }
+
         [TestMethod]
         [DynamicData(nameof(CommonPO.GetAllCategories), typeof(CommonPO), DynamicDataSourceType.Method)]
         public void VerifyThatReturnToMainMenuLinkIsWorkingForEachCategory(string page)
         {
-            homePage.ClickCategoryImage(page);
-            Assert.IsTrue(Driver.Url.Contains(page));
+            NavigateToCategory(page);
             productCategoryPage.ClickReturnToMainMenuButton();
-            Assert.IsTrue(Driver.Url.Equals("https://petstore.octoperf.com/actions/Catalog.action"));
+            Assert.AreEqual("https://petstore.octoperf.com/actions/Catalog.action", Driver.Url);
         }
 
         [TestMethod]
         [DynamicData(nameof(CommonPO.GetAllCategories), typeof(CommonPO), DynamicDataSourceType.Method)]
         public void VerifyThatAllSubCategoryLinksAreClickableForEachCategory(string page)
         {
-            homePage.ClickCategoryImage(page);
-            Assert.IsTrue(Driver.Url.Contains(page));
-            List<string> subCatNames = productCategoryPage.GetAllSubCategories();
-            List<string> subCatIds = productCategoryPage.GetAllProductIDs();
-            foreach (var item in subCatNames)
+            NavigateToCategory(page);
+
+            var subCatNames = productCategoryPage.GetAllSubCategories();
+            var subCatIds = productCategoryPage.GetAllProductIDs();
+
+            foreach (var name in subCatNames)
             {
-                productCategoryPage.ClickOnSubCategoryByProductName(item);
-                Assert.IsTrue(itemsPage.GetSubCategory().Equals(item));
+                productCategoryPage.ClickOnSubCategoryByProductName(name);
+                Assert.AreEqual(name, itemsPage.GetSubCategory());
                 Driver.Back();
             }
-            foreach (var item in subCatIds)
+
+            foreach (var id in subCatIds)
             {
-                productCategoryPage.ClickOnSubCategoryByProductID(item);
-                Assert.IsTrue(Driver.Url.EndsWith(item));
+                productCategoryPage.ClickOnSubCategoryByProductID(id);
+                Assert.IsTrue(Driver.Url.EndsWith(id));
                 Driver.Back();
             }
+
             for (int i = 1; i < subCatNames.Count; i++)
             {
                 productCategoryPage.ClickOnSubCategoryByIndex(i);
@@ -57,28 +67,26 @@ namespace PetStore.Tests
             }
         }
 
-
         [TestMethod]
         [DynamicData(nameof(CommonPO.GetAllCategories), typeof(CommonPO), DynamicDataSourceType.Method)]
         public void VerifyProductCategoryNameIsNotNull(string page)
         {
-            homePage.ClickCategoryImage(page);
-            Assert.IsTrue(Driver.Url.Contains(page));
-            string category = productCategoryPage.GetCategory();
-            Assert.IsNotNull(category);
+            NavigateToCategory(page);
+            var category = productCategoryPage.GetCategory();
+            Assert.IsNotNull(category, "Category name should not be null");
         }
 
         [TestMethod]
         [DynamicData(nameof(CommonPO.GetAllCategories), typeof(CommonPO), DynamicDataSourceType.Method)]
         public void VerifyAtLeastOneProductSubCategoryExists(string page)
         {
-            homePage.ClickCategoryImage(page);
-            Assert.IsTrue(Driver.Url.Contains(page));
-            List<string> subCategory = productCategoryPage.GetAllSubCategories();
-            Assert.IsTrue(subCategory.Count > 0);
-            List<string> subCategory1 = productCategoryPage.GetAllProductIDs();
-            Assert.IsTrue(subCategory1.Count > 0);
-        }
+            NavigateToCategory(page);
 
+            var subCategories = productCategoryPage.GetAllSubCategories();
+            Assert.IsTrue(subCategories.Count > 0, "No product subcategories found");
+
+            var subCategoryIds = productCategoryPage.GetAllProductIDs();
+            Assert.IsTrue(subCategoryIds.Count > 0, "No product IDs found");
+        }
     }
 }

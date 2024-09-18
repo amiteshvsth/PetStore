@@ -1,18 +1,13 @@
 ﻿using PetStore.Base;
-using PetStore.Pages.Common;
 using PetStore.Pages;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using PetStore.Pages.Common;
 using PetStore.utilities;
 
 namespace PetStore.Tests
 {
     [TestClass]
     [TestCategory("MyAccountPageTests")]
-    public class MyAccountPageTests:BaseTests
+    public class MyAccountPageTests : BaseTests
     {
         SignInPO signInPage;
         CommonPO commonPage;
@@ -33,7 +28,7 @@ namespace PetStore.Tests
         [TestMethod]
         public void VerifyThatUserIdIsCorrect()
         {
-            
+
             string userId = myAccountPage.GetUserId();
             Assert.IsTrue(userId.Equals("mAQyo6677"));
         }

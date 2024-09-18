@@ -30,7 +30,12 @@ namespace PetStore.Pages
         private readonly By enableMyBannerField = By.Name("account.bannerOption");
         private readonly By submitButtonField = By.Name("newAccount");
 
-        public void SignUpUser()
+        public class SignUpResult
+        {
+            public string UserId { get; set; }
+            public string Password { get; set; }
+        }
+        public SignUpResult SignUpUser()
         {
             EnterUserId(generatedUser.UserId);
             EnterPassword(generatedUser.Password);
@@ -50,7 +55,14 @@ namespace PetStore.Pages
             SetEnableMyList(generatedUser.EnableMyList);
             SetEnableMyBanner(generatedUser.EnableMyBanner);
             ClickSubmitButton();
+
+            return new SignUpResult
+            {
+                UserId = generatedUser.UserId,
+                Password = generatedUser.Password
+            };
         }
+
         public void EnterUserId(string userId)
         {
             Wait.UntilElementExists(userIdField).EnterText(userId);
